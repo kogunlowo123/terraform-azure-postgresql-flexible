@@ -2,6 +2,51 @@
 
 Terraform module for deploying Azure Database for PostgreSQL Flexible Server with support for high availability, geo-redundant backups, read replicas, pgBouncer connection pooling, and private endpoint integration.
 
+## Architecture
+
+```mermaid
+flowchart TB
+    subgraph Server["PostgreSQL Flexible Server"]
+        style Server fill:#0078D4,color:#fff
+        Primary["Primary Instance"]
+        HA["High Availability\n(Zone-Redundant)"]
+        Configs["Server Configurations\n(pgBouncer)"]
+    end
+
+    subgraph Databases["Databases"]
+        style Databases fill:#3F8624,color:#fff
+        DB1["Database 1"]
+        DB2["Database N"]
+    end
+
+    subgraph Security["Security"]
+        style Security fill:#8C4FFF,color:#fff
+        FirewallRules["Firewall Rules"]
+        ADAuth["Azure AD\nAuthentication"]
+        CMK["CMK Encryption"]
+    end
+
+    subgraph Networking["Private Networking"]
+        style Networking fill:#DD344C,color:#fff
+        DelegatedSubnet["Delegated Subnet"]
+        PrivateDNS["Private DNS Zone"]
+    end
+
+    subgraph Backup["Backup & Maintenance"]
+        style Backup fill:#FF9900,color:#fff
+        GeoBackup["Geo-Redundant Backup"]
+        AutoGrow["Storage Auto-Grow"]
+        MaintenanceWin["Maintenance Window"]
+    end
+
+    Server --> Databases
+    Server --> Security
+    Server --> Networking
+    Server --> Backup
+    Primary --> HA
+    DelegatedSubnet --> PrivateDNS
+```
+
 ## Features
 
 - PostgreSQL Flexible Server with configurable SKU and storage
