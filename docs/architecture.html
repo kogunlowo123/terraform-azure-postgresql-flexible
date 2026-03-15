@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architecture -- terraform-azure-postgresql-flexible</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b0c0b;color:#f5f2eb;font-family:'SF Mono','Cascadia Code','Fira Code',monospace;line-height:1.7;padding:0}
+a{color:#c8420a;text-decoration:none}a:hover{text-decoration:underline}
+.container{max-width:1200px;margin:0 auto;padding:2rem}
+h1,h2,h3{color:#f5f2eb;margin-bottom:1rem}
+h1{font-size:2rem;border-bottom:3px solid #c8420a;padding-bottom:.5rem;margin-bottom:2rem}
+h2{font-size:1.4rem;border-bottom:1px solid #333;padding-bottom:.4rem;margin-top:2.5rem}
+h3{font-size:1.1rem;color:#c8420a}
+.badge{display:inline-block;background:#0078d4;color:#fff;padding:4px 14px;border-radius:4px;font-size:.75rem;font-weight:700;margin-right:8px;letter-spacing:.5px}
+.badge-accent{background:#c8420a}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin:1.5rem 0}
+.card{background:#161816;border:1px solid #222;border-radius:8px;padding:1.2rem}
+.card h3{margin-bottom:.5rem;font-size:.95rem}
+.card p{font-size:.82rem;color:#bbb}
+.card .num{font-size:1.8rem;color:#c8420a;font-weight:700}
+.arch-diagram{background:#121312;border:1px solid #333;border-radius:8px;padding:2rem;margin:1.5rem 0;overflow-x:auto}
+.box{background:#1a1b1a;border:2px solid #c8420a;border-radius:6px;padding:.7rem 1.2rem;text-align:center;font-size:.8rem;min-width:110px;display:inline-block}
+.box.blue{border-color:#0078d4;color:#7ec8f0}
+.box.green{border-color:#3f8624;color:#7fba00}
+.box.red{border-color:#dd344c;color:#ff6b7a}
+.box.purple{border-color:#8c4fff;color:#b4a0ff}
+.box.orange{border-color:#ff9900;color:#ffb84d}
+.arrow{color:#555;font-size:1.2rem}
+.table-wrap{overflow-x:auto;margin:1rem 0}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{background:#1a1b1a;color:#c8420a;text-align:left;padding:.6rem .8rem;border-bottom:2px solid #333}
+td{padding:.5rem .8rem;border-bottom:1px solid #1e1f1e}
+tr:hover td{background:#161816}
+.checklist{list-style:none;padding:0}
+.checklist li{padding:.4rem 0;font-size:.85rem}
+.checklist li::before{content:"[ ] ";color:#c8420a;font-weight:700}
+.checklist li.done::before{content:"[x] ";color:#3f8624}
+code{background:#1a1b1a;padding:2px 6px;border-radius:3px;font-size:.82rem}
+pre{background:#121312;border:1px solid #333;border-radius:6px;padding:1rem;overflow-x:auto;font-size:.8rem;margin:1rem 0}
+.section{margin:2rem 0}
+.footer{border-top:1px solid #333;padding-top:1.5rem;margin-top:3rem;text-align:center;font-size:.75rem;color:#666}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+@media(max-width:768px){.grid-2{grid-template-columns:1fr}}
+.flow-row{display:flex;align-items:center;justify-content:center;gap:.4rem;margin:.5rem 0;flex-wrap:wrap}
+.flow-col{display:flex;flex-direction:column;align-items:center;gap:.4rem}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div style="margin-bottom:1rem">
+<span class="badge">Microsoft Azure</span>
+<span class="badge badge-accent">Terraform Module</span>
+<span class="badge" style="background:#333">Database</span>
+</div>
+
+<h1>terraform-azure-postgresql-flexible</h1>
+
+<div class="section">
+<h2>Executive Summary</h2>
+<p>Terraform module for deploying Azure Database for PostgreSQL Flexible Server with zone-redundant high availability, geo-redundant backups, pgBouncer connection pooling, VNet integration via delegated subnets, customer-managed key (CMK) encryption, Azure AD authentication, firewall rules, and diagnostic settings for threat detection. Supports PostgreSQL versions up to 16 with configurable maintenance windows.</p>
+</div>
+
+<div class="section">
+<h2>Overview</h2>
+<div class="cards">
+<div class="card"><div class="num">6</div><h3>Resource Types</h3><p>Server, Databases, Configs, Firewall, AD Admin, Diagnostics</p></div>
+<div class="card"><div class="num">20</div><h3>Variables</h3><p>Configurable input parameters</p></div>
+<div class="card"><div class="num">11</div><h3>Outputs</h3><p>Server ID, FQDN, SKU, database IDs</p></div>
+<div class="card"><div class="num">3</div><h3>Examples</h3><p>Basic, Advanced, Complete</p></div>
+</div>
+</div>
+
+<div class="section">
+<h2>Architecture Diagram</h2>
+<div class="arch-diagram">
+<div class="flow-col">
+<div class="flow-row">
+<div style="border:2px solid #0078d4;border-radius:8px;padding:1.5rem;margin:.3rem;min-width:400px">
+<div style="color:#7ec8f0;font-weight:700;text-align:center;margin-bottom:.5rem">PostgreSQL Flexible Server</div>
+<div class="flow-row">
+<div class="box blue">Primary Instance<br><small>Zone 1</small></div>
+<div class="arrow">&harr;</div>
+<div class="box blue">Standby Replica<br><small>Zone 2 (HA)</small></div>
+</div>
+<div class="flow-row" style="margin-top:.5rem">
+<div class="box blue">pgBouncer<br>Connection Pooling</div>
+<div class="box blue">Server Configs</div>
+</div>
+</div>
+</div>
+<div class="arrow" style="display:block;text-align:center">|</div>
+<div class="flow-row">
+<div style="border:2px solid #3f8624;border-radius:8px;padding:1rem;margin:.3rem">
+<div style="color:#7fba00;font-weight:700;text-align:center;margin-bottom:.5rem">Databases</div>
+<div class="flow-row">
+<div class="box green">Database 1<br><small>UTF8 / en_US.utf8</small></div>
+<div class="box green">Database N</div>
+</div>
+</div>
+</div>
+<div class="flow-row">
+<div style="border:2px solid #8c4fff;border-radius:8px;padding:1rem;margin:.3rem">
+<div style="color:#b4a0ff;font-weight:700;text-align:center;margin-bottom:.5rem">Security</div>
+<div class="flow-row">
+<div class="box purple">Firewall Rules</div>
+<div class="box purple">Azure AD Auth</div>
+<div class="box purple">CMK Encryption</div>
+</div>
+</div>
+</div>
+<div class="flow-row">
+<div style="border:2px solid #dd344c;border-radius:8px;padding:1rem;margin:.3rem">
+<div style="color:#ff6b7a;font-weight:700;text-align:center;margin-bottom:.5rem">Networking</div>
+<div class="flow-row">
+<div class="box red">Delegated Subnet</div>
+<div class="box red">Private DNS Zone</div>
+</div>
+</div>
+<div style="border:2px solid #ff9900;border-radius:8px;padding:1rem;margin:.3rem">
+<div style="color:#ffb84d;font-weight:700;text-align:center;margin-bottom:.5rem">Resilience</div>
+<div class="flow-row">
+<div class="box orange">Geo-Redundant<br>Backup (35 days)</div>
+<div class="box orange">Storage<br>Auto-Grow</div>
+<div class="box orange">Maintenance<br>Window</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="section">
+<h2>Component Breakdown</h2>
+<div class="table-wrap">
+<table>
+<tr><th>Resource</th><th>Purpose</th></tr>
+<tr><td><code>azurerm_postgresql_flexible_server</code></td><td>Core server with HA, storage, backup, VNet integration, CMK, AD auth</td></tr>
+<tr><td><code>azurerm_postgresql_flexible_server_database</code></td><td>Individual databases with charset and collation</td></tr>
+<tr><td><code>azurerm_postgresql_flexible_server_configuration</code></td><td>Server parameters (pgBouncer, query store, etc.)</td></tr>
+<tr><td><code>azurerm_postgresql_flexible_server_firewall_rule</code></td><td>IP-based access control rules</td></tr>
+<tr><td><code>azurerm_postgresql_flexible_server_active_directory_administrator</code></td><td>Azure AD admin for passwordless auth</td></tr>
+<tr><td><code>azurerm_monitor_diagnostic_setting</code></td><td>PostgreSQL logs, sessions, query store, table stats</td></tr>
+</table>
+</div>
+</div>
+
+<div class="section">
+<h2>Data Flow</h2>
+<div class="arch-diagram">
+<div class="flow-row">
+<div class="box purple">Application</div>
+<div class="arrow">&rarr;</div>
+<div class="box red">Delegated Subnet<br>/ Private DNS</div>
+<div class="arrow">&rarr;</div>
+<div class="box blue">pgBouncer<br>Pool</div>
+<div class="arrow">&rarr;</div>
+<div class="box blue">Primary Server</div>
+<div class="arrow">&rarr;</div>
+<div class="box green">Database</div>
+</div>
+</div>
+<p style="font-size:.85rem;color:#bbb;margin-top:.5rem"><strong>1.</strong> Application connects through delegated subnet (VNet integration) or firewall-allowed IP. <strong>2.</strong> pgBouncer pools connections for efficiency. <strong>3.</strong> Primary server processes queries; HA standby in another zone for automatic failover. <strong>4.</strong> Backups replicated geo-redundantly for DR. <strong>5.</strong> Diagnostic logs shipped for threat detection analysis.</p>
+</div>
+
+<div class="section">
+<h2>Security Controls</h2>
+<div class="grid-2">
+<div class="card">
+<h3>Authentication</h3>
+<p>- Azure AD authentication support<br>- Service Principal as AD admin<br>- Password + AD dual auth mode<br>- Administrator credentials (sensitive)</p>
+</div>
+<div class="card">
+<h3>Encryption</h3>
+<p>- Customer-managed key (CMK) support<br>- Geo-backup CMK with separate identity<br>- TLS enforcement in transit<br>- Storage encryption at rest</p>
+</div>
+<div class="card">
+<h3>Network Isolation</h3>
+<p>- Delegated subnet (VNet integration)<br>- Private DNS zone resolution<br>- Public access auto-disabled when private<br>- Firewall rules for allowed IPs</p>
+</div>
+<div class="card">
+<h3>Monitoring</h3>
+<p>- Threat detection diagnostics<br>- Query store runtime analysis<br>- Wait stats collection<br>- Table and transaction stats<br>- Session logging</p>
+</div>
+</div>
+</div>
+
+<div class="section">
+<h2>Industry Adaptation</h2>
+<div class="cards">
+<div class="card"><h3>SaaS Applications</h3><p>pgBouncer for high-connection workloads, auto-grow storage, zone-redundant HA, multiple databases per server</p></div>
+<div class="card"><h3>Financial Services</h3><p>CMK encryption, geo-redundant backups, Azure AD auth only, VNet-integrated with no public access</p></div>
+<div class="card"><h3>Healthcare</h3><p>HIPAA-compliant configuration, 35-day backup retention, threat detection enabled, AD authentication</p></div>
+<div class="card"><h3>Analytics Platforms</h3><p>Memory-optimized SKU (MO_Standard), query store for performance tuning, large storage with auto-grow</p></div>
+</div>
+</div>
+
+<div class="section">
+<h2>Production Readiness Checklist</h2>
+<ul class="checklist">
+<li class="done">Zone-redundant high availability enabled</li>
+<li class="done">Geo-redundant backups with 35-day retention</li>
+<li class="done">Storage auto-grow enabled</li>
+<li class="done">Threat detection diagnostics active</li>
+<li class="done">VNet integration via delegated subnet</li>
+<li>Enable pgBouncer for connection pooling</li>
+<li>Configure Azure AD authentication</li>
+<li>Set up CMK encryption with Key Vault</li>
+<li>Define maintenance window for off-peak hours</li>
+<li>Tune server configurations for workload</li>
+</ul>
+</div>
+
+<div class="section">
+<h2>Configuration Reference</h2>
+<div class="table-wrap">
+<table>
+<tr><th>Variable</th><th>Type</th><th>Default</th><th>Description</th></tr>
+<tr><td><code>name</code></td><td>string</td><td>--</td><td>Server name</td></tr>
+<tr><td><code>sku_name</code></td><td>string</td><td>--</td><td>SKU (GP_Standard_D2s_v3, etc.)</td></tr>
+<tr><td><code>storage_mb</code></td><td>number</td><td>--</td><td>Max storage in MB</td></tr>
+<tr><td><code>postgresql_version</code></td><td>string</td><td>16</td><td>PostgreSQL version</td></tr>
+<tr><td><code>high_availability</code></td><td>object</td><td>null</td><td>HA mode (ZoneRedundant/SameZone)</td></tr>
+<tr><td><code>backup_retention_days</code></td><td>number</td><td>35</td><td>Backup retention (7-35 days)</td></tr>
+<tr><td><code>geo_redundant_backup_enabled</code></td><td>bool</td><td>true</td><td>Geo-redundant backups</td></tr>
+<tr><td><code>databases</code></td><td>map(object)</td><td>{}</td><td>Databases to create</td></tr>
+<tr><td><code>server_configurations</code></td><td>map(string)</td><td>{}</td><td>Server parameters</td></tr>
+<tr><td><code>customer_managed_key</code></td><td>object</td><td>null</td><td>CMK encryption config</td></tr>
+</table>
+</div>
+</div>
+
+<div class="section">
+<h2>Deployment</h2>
+<pre>
+terraform init
+terraform plan -var-file="postgresql.tfvars"
+terraform apply -var-file="postgresql.tfvars"
+
+# Verify server
+az postgres flexible-server show --name my-psql-server --resource-group my-resource-group
+</pre>
+</div>
+
+<div class="section">
+<h2>Links</h2>
+<p>
+<a href="https://learn.microsoft.com/en-us/azure/postgresql/flexible-server/">Azure PostgreSQL Flexible Server Docs</a> |
+<a href="https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/postgresql_flexible_server">Terraform Registry</a> |
+<a href="../examples/basic/">Basic Example</a> |
+<a href="../examples/complete/">Complete Example</a>
+</p>
+</div>
+
+<div class="footer">
+<p>terraform-azure-postgresql-flexible &mdash; Architecture Document</p>
+<p>Generated on 2026-03-15 &bull; Terraform &ge; 1.5.0 &bull; AzureRM &ge; 3.80.0</p>
+<p style="margin-top:.5rem"><span class="badge">Microsoft Azure</span> Verified Module Architecture</p>
+</div>
+
+</div>
+</body>
+</html>
