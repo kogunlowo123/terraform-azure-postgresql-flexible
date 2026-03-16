@@ -9,7 +9,7 @@ output "server_name" {
 }
 
 output "server_fqdn" {
-  description = "The fully qualified domain name (FQDN) of the PostgreSQL Flexible Server."
+  description = "The FQDN of the PostgreSQL Flexible Server."
   value       = azurerm_postgresql_flexible_server.this.fqdn
 }
 

@@ -1,6 +1,3 @@
-#--------------------------------------------------------------
-# PostgreSQL Flexible Server
-#--------------------------------------------------------------
 resource "azurerm_postgresql_flexible_server" "this" {
   name                          = var.name
   resource_group_name           = var.resource_group_name
@@ -16,8 +13,8 @@ resource "azurerm_postgresql_flexible_server" "this" {
   auto_grow_enabled             = var.auto_grow_enabled
   zone                          = var.zone
   delegated_subnet_id           = var.delegated_subnet_id
-  private_dns_zone_id           = local.is_private ? var.private_dns_zone_id : null
-  public_network_access_enabled = local.is_private ? false : true
+  private_dns_zone_id           = var.delegated_subnet_id != null && var.private_dns_zone_id != null ? var.private_dns_zone_id : null
+  public_network_access_enabled = var.delegated_subnet_id != null && var.private_dns_zone_id != null ? false : true
 
   dynamic "high_availability" {
     for_each = var.high_availability != null ? [var.high_availability] : []
@@ -55,7 +52,7 @@ resource "azurerm_postgresql_flexible_server" "this" {
     }
   }
 
-  tags = local.tags
+  tags = var.tags
 
   lifecycle {
     ignore_changes = [
@@ -65,9 +62,6 @@ resource "azurerm_postgresql_flexible_server" "this" {
   }
 }
 
-#--------------------------------------------------------------
-# Databases
-#--------------------------------------------------------------
 resource "azurerm_postgresql_flexible_server_database" "this" {
   for_each = var.databases
 
@@ -77,9 +71,6 @@ resource "azurerm_postgresql_flexible_server_database" "this" {
   collation = each.value.collation
 }
 
-#--------------------------------------------------------------
-# Server Configurations
-#--------------------------------------------------------------
 resource "azurerm_postgresql_flexible_server_configuration" "this" {
   for_each = var.server_configurations
 
@@ -88,9 +79,6 @@ resource "azurerm_postgresql_flexible_server_configuration" "this" {
   value     = each.value
 }
 
-#--------------------------------------------------------------
-# Firewall Rules
-#--------------------------------------------------------------
 resource "azurerm_postgresql_flexible_server_firewall_rule" "this" {
   for_each = var.firewall_rules
 
@@ -100,9 +88,6 @@ resource "azurerm_postgresql_flexible_server_firewall_rule" "this" {
   end_ip_address   = each.value.end_ip_address
 }
 
-#--------------------------------------------------------------
-# Active Directory Administrator
-#--------------------------------------------------------------
 resource "azurerm_postgresql_flexible_server_active_directory_administrator" "this" {
   count = var.enable_active_directory_auth ? 1 : 0
 
@@ -110,13 +95,10 @@ resource "azurerm_postgresql_flexible_server_active_directory_administrator" "th
   resource_group_name = var.resource_group_name
   tenant_id           = var.ad_admin_tenant_id
   object_id           = var.ad_admin_object_id
-  principal_name      = local.ad_admin_display_name
+  principal_name      = "AAD Admin - ${var.name}"
   principal_type      = "ServicePrincipal"
 }
 
-#--------------------------------------------------------------
-# Diagnostic Setting
-#--------------------------------------------------------------
 resource "azurerm_monitor_diagnostic_setting" "this" {
   count = var.enable_threat_detection ? 1 : 0
 

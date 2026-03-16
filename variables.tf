@@ -4,17 +4,17 @@ variable "name" {
 }
 
 variable "resource_group_name" {
-  description = "The name of the resource group in which to create the PostgreSQL Flexible Server."
+  description = "The name of the resource group for the PostgreSQL Flexible Server."
   type        = string
 }
 
 variable "location" {
-  description = "The Azure region where the PostgreSQL Flexible Server should be created."
+  description = "The Azure region where the PostgreSQL Flexible Server will be created."
   type        = string
 }
 
 variable "sku_name" {
-  description = "The SKU name for the PostgreSQL Flexible Server (e.g., GP_Standard_D2s_v3, MO_Standard_E4s_v3)."
+  description = "The SKU name for the PostgreSQL Flexible Server (e.g., GP_Standard_D2s_v3)."
   type        = string
 }
 
@@ -49,7 +49,7 @@ variable "administrator_password" {
 }
 
 variable "delegated_subnet_id" {
-  description = "The ID of the subnet to which the PostgreSQL Flexible Server is delegated."
+  description = "The ID of the subnet delegated to the PostgreSQL Flexible Server."
   type        = string
   default     = null
 }
@@ -76,19 +76,19 @@ variable "high_availability" {
 }
 
 variable "backup_retention_days" {
-  description = "The number of days to retain backups. Must be between 7 and 35."
+  description = "The number of days to retain backups (7-35)."
   type        = number
   default     = 35
 }
 
 variable "geo_redundant_backup_enabled" {
-  description = "Whether geo-redundant backups are enabled for the PostgreSQL Flexible Server."
+  description = "Whether geo-redundant backups are enabled."
   type        = bool
   default     = true
 }
 
 variable "auto_grow_enabled" {
-  description = "Whether storage auto-grow is enabled for the PostgreSQL Flexible Server."
+  description = "Whether storage auto-grow is enabled."
   type        = bool
   default     = true
 }
@@ -103,7 +103,7 @@ variable "databases" {
 }
 
 variable "server_configurations" {
-  description = "Map of server configuration parameters to set on the PostgreSQL Flexible Server."
+  description = "Map of server configuration parameters to set."
   type        = map(string)
   default     = {}
 }
@@ -118,36 +118,36 @@ variable "firewall_rules" {
 }
 
 variable "enable_active_directory_auth" {
-  description = "Whether to enable Active Directory authentication for the PostgreSQL Flexible Server."
+  description = "Whether to enable Active Directory authentication."
   type        = bool
   default     = false
 }
 
 variable "ad_admin_object_id" {
-  description = "The object ID of the Azure AD administrator for the PostgreSQL Flexible Server."
+  description = "The object ID of the Azure AD administrator."
   type        = string
   default     = null
 }
 
 variable "ad_admin_tenant_id" {
-  description = "The tenant ID of the Azure AD administrator for the PostgreSQL Flexible Server."
+  description = "The tenant ID of the Azure AD administrator."
   type        = string
   default     = null
 }
 
 variable "customer_managed_key" {
-  description = "Customer-managed key configuration for the PostgreSQL Flexible Server."
+  description = "Customer-managed key configuration for encryption."
   type = object({
-    key_vault_key_id                  = string
-    primary_user_assigned_identity_id = optional(string)
-    geo_backup_key_vault_key_id       = optional(string)
+    key_vault_key_id                     = string
+    primary_user_assigned_identity_id    = optional(string)
+    geo_backup_key_vault_key_id          = optional(string)
     geo_backup_user_assigned_identity_id = optional(string)
   })
   default = null
 }
 
 variable "enable_threat_detection" {
-  description = "Whether to enable threat detection (Microsoft Defender) for the PostgreSQL Flexible Server."
+  description = "Whether to enable threat detection diagnostics."
   type        = bool
   default     = true
 }
@@ -163,7 +163,7 @@ variable "maintenance_window" {
 }
 
 variable "tags" {
-  description = "A mapping of tags to assign to the resources."
+  description = "Tags to apply to all resources."
   type        = map(string)
   default     = {}
 }
