@@ -82,11 +82,11 @@ module "postgresql" {
   }
 
   server_configurations = {
-    "pgbouncer.enabled"                = "true"
-    "pgbouncer.default_pool_size"      = "50"
-    "pg_stat_statements.track"         = "all"
-    "shared_preload_libraries"         = "pg_stat_statements"
-    "azure.extensions"                 = "PG_STAT_STATEMENTS,PGCRYPTO,UUID-OSSP"
+    "pgbouncer.enabled"           = "true"
+    "pgbouncer.default_pool_size" = "50"
+    "pg_stat_statements.track"    = "all"
+    "shared_preload_libraries"    = "pg_stat_statements"
+    "azure.extensions"            = "PG_STAT_STATEMENTS,PGCRYPTO,UUID-OSSP"
   }
 
   maintenance_window = {

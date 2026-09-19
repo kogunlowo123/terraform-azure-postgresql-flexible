@@ -131,17 +131,17 @@ module "postgresql" {
   }
 
   server_configurations = {
-    "pgbouncer.enabled"                = "true"
-    "pgbouncer.default_pool_size"      = "100"
-    "pgbouncer.max_client_conn"        = "500"
-    "pg_stat_statements.track"         = "all"
-    "shared_preload_libraries"         = "pg_stat_statements"
-    "azure.extensions"                 = "PG_STAT_STATEMENTS,PGCRYPTO,UUID-OSSP,POSTGIS"
-    "log_checkpoints"                  = "on"
-    "log_connections"                   = "on"
-    "log_disconnections"                = "on"
-    "log_duration"                      = "on"
-    "connection_throttle.enable"        = "on"
+    "pgbouncer.enabled"           = "true"
+    "pgbouncer.default_pool_size" = "100"
+    "pgbouncer.max_client_conn"   = "500"
+    "pg_stat_statements.track"    = "all"
+    "shared_preload_libraries"    = "pg_stat_statements"
+    "azure.extensions"            = "PG_STAT_STATEMENTS,PGCRYPTO,UUID-OSSP,POSTGIS"
+    "log_checkpoints"             = "on"
+    "log_connections"             = "on"
+    "log_disconnections"          = "on"
+    "log_duration"                = "on"
+    "connection_throttle.enable"  = "on"
   }
 
   enable_active_directory_auth = true
