@@ -9,6 +9,14 @@ resource "azurerm_resource_group" "example" {
   location = "East US"
 }
 
+resource "azurerm_log_analytics_workspace" "example" {
+  name                = "log-postgresql-complete"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+}
+
 resource "azurerm_virtual_network" "example" {
   name                = "vnet-postgresql"
   location            = azurerm_resource_group.example.location
@@ -159,7 +167,8 @@ module "postgresql" {
     start_minute = 0
   }
 
-  enable_threat_detection = true
+  enable_threat_detection    = true
+  log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
 
   tags = {
     Environment = "production"

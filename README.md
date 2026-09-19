@@ -122,7 +122,7 @@ module "postgresql" {
 | Name      | Version   |
 |-----------|-----------|
 | terraform | >= 1.5.0  |
-| azurerm   | >= 3.80.0 |
+| azurerm   | >= 4.0.0, < 5.0.0 |
 
 ## Inputs
 
@@ -152,6 +152,7 @@ module "postgresql" {
 | ad_admin_tenant_id | AD admin tenant ID | `string` | `null` | no |
 | customer_managed_key | CMK encryption configuration | `object` | `null` | no |
 | enable_threat_detection | Enable threat detection diagnostics | `bool` | `true` | no |
+| log_analytics_workspace_id | Log Analytics workspace ID receiving diagnostics; the diagnostic setting is only created when this is set and enable_threat_detection is true | `string` | `null` | no |
 | maintenance_window | Maintenance window configuration | `object` | `null` | no |
 | tags | Tags to assign to resources | `map(string)` | `{}` | no |
 

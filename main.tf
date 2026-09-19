@@ -100,11 +100,11 @@ resource "azurerm_postgresql_flexible_server_active_directory_administrator" "th
 }
 
 resource "azurerm_monitor_diagnostic_setting" "this" {
-  count = var.enable_threat_detection ? 1 : 0
+  count = var.enable_threat_detection && var.log_analytics_workspace_id != null ? 1 : 0
 
   name                       = "${var.name}-diag"
   target_resource_id         = azurerm_postgresql_flexible_server.this.id
-  log_analytics_workspace_id = null
+  log_analytics_workspace_id = var.log_analytics_workspace_id
 
   enabled_log {
     category = "PostgreSQLLogs"
@@ -130,8 +130,7 @@ resource "azurerm_monitor_diagnostic_setting" "this" {
     category = "PostgreSQLFlexDatabaseXacts"
   }
 
-  metric {
+  enabled_metric {
     category = "AllMetrics"
-    enabled  = true
   }
 }

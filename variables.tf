@@ -152,6 +152,12 @@ variable "enable_threat_detection" {
   default     = true
 }
 
+variable "log_analytics_workspace_id" {
+  description = "Log Analytics workspace ID that receives diagnostic logs and metrics. Required for the diagnostic setting to be created when enable_threat_detection is true; if null, no diagnostic setting is created."
+  type        = string
+  default     = null
+}
+
 variable "maintenance_window" {
   description = "Maintenance window configuration for the PostgreSQL Flexible Server."
   type = object({
